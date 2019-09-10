@@ -31,6 +31,7 @@ defmodule Vampire.Application.Server do
         existing_val = Map.fetch!(dict, k)
         new_val = existing_val ++ v
         new = Map.replace!(dict, k , new_val)
+        format_output(k, v)
         { :reply, new, new }
       else
         new = dict
@@ -38,11 +39,16 @@ defmodule Vampire.Application.Server do
       end
     else
       new = Map.put(dict, k, v)
+      format_output(k, v)
       { :reply, new, new }
     end
 
   end
   ###
+
+  def format_output(k, v) do
+  IO.inspect("#{k}"<>" "<> Enum.reduce(v, fn x, acc -> "#{x}"<>" "<>"#{acc}" end))
+  end
 
   def handle_call(:show, _from, dict) do
     {:reply, dict, dict}
@@ -52,8 +58,8 @@ defmodule Vampire.Application.Server do
 
   ## LOGIC
 
-  def hello(i,j) do
-
+  def hello(args) do
+    [i, j] = for arg <- System.argv(), do: String.trim(arg) |> String.to_integer
     l = i..j
     Enum.each(l, fn(s)->
     x = Integer.to_string(s)
